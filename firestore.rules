@@ -1,0 +1,176 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: user uid
+    // Fields:
+    //   - email: string (required)
+    //   - role: string (required, 'admin' or 'user')
+    //   - createdAt: timestamp
+    //
+    // Collection: cases
+    // Document ID: auto-generated
+    // Fields:
+    //   - type: string (required)
+    //   - result: string (required)
+    //   - desc: string (required)
+    //   - docImg: string (required)
+    //   - order: number (required)
+    //   - createdAt: timestamp
+    //
+    // Collection: lawyers
+    // Document ID: auto-generated
+    // Fields:
+    //   - name: string (required)
+    //   - role: string (required)
+    //   - img: string (required)
+    //   - order: number (required)
+    //   - createdAt: timestamp
+    //
+    // Collection: certificates
+    // Document ID: auto-generated
+    // Fields:
+    //   - title: string (required)
+    //   - img: string (required)
+    //   - order: number (required)
+    //   - createdAt: timestamp
+    //
+    // Collection: consultations
+    // Document ID: auto-generated
+    // Fields:
+    //   - name: string (required)
+    //   - phone: string (required)
+    //   - alcoholLevel: string (required)
+    //   - duiHistory: string (required)
+    //   - details: string (required)
+    //   - status: string (required, 'pending', 'contacted', 'completed')
+    //   - createdAt: timestamp
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+        (request.auth.token.email == "milsuip@gmail.com" && request.auth.token.email_verified == true)
+      );
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function isString(field) {
+      return request.resource.data[field] is string;
+    }
+
+    function isNumber(field) {
+      return request.resource.data[field] is number;
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidUser() {
+      return hasRequiredFields(['email', 'role']) &&
+             isString('email') &&
+             isString('role') &&
+             request.resource.data.role in ['admin', 'user'];
+    }
+
+    function isValidCase() {
+      return hasRequiredFields(['type', 'result', 'desc', 'docImg', 'order']) &&
+             isString('type') && isString('result') && isString('desc') && isString('docImg') &&
+             isNumber('order');
+    }
+
+    function isValidLawyer() {
+      return hasRequiredFields(['name', 'role', 'img', 'order']) &&
+             isString('name') && isString('role') && isString('img') &&
+             isNumber('order');
+    }
+
+    function isValidCertificate() {
+      return hasRequiredFields(['title', 'img', 'order']) &&
+             isString('title') && isString('img') &&
+             isNumber('order');
+    }
+
+    function isValidConsultation() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['name', 'phone', 'details', 'status']) &&
+             data.name is string &&
+             data.phone is string &&
+             data.details is string &&
+             data.status in ['pending', 'contacted', 'completed'] &&
+             (!('alcoholLevel' in data) || data.alcoholLevel is string) &&
+             (!('duiHistory' in data) || data.duiHistory is string);
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      // Only admins can create/update users, or users can create their own non-admin profile
+      allow create: if isAuthenticated() && isValidUser() && (
+        isAdmin() || (request.auth.uid == userId && request.resource.data.role == 'user')
+      );
+      allow update: if isAdmin() && isValidUser();
+      allow delete: if isAdmin();
+    }
+
+    match /cases/{caseId} {
+      allow read: if true; // Publicly readable
+      allow create: if isAdmin() && isValidCase();
+      allow update: if isAdmin() && isValidCase();
+      allow delete: if isAdmin();
+    }
+
+    match /lawyers/{lawyerId} {
+      allow read: if true; // Publicly readable
+      allow create: if isAdmin() && isValidLawyer();
+      allow update: if isAdmin() && isValidLawyer();
+      allow delete: if isAdmin();
+    }
+
+    match /certificates/{certificateId} {
+      allow read: if true; // Publicly readable
+      allow create: if isAdmin() && isValidCertificate();
+      allow update: if isAdmin() && isValidCertificate();
+      allow delete: if isAdmin();
+    }
+
+    match /consultations/{consultationId} {
+      // Admins can read all, users can't read others (no ownership field here, so only admins read)
+      allow read: if isAdmin();
+      // Anyone can create a consultation request
+      allow create: if isValidConsultation();
+      allow update: if isAdmin() && isValidConsultation();
+      allow delete: if isAdmin();
+    }
+
+    match /popups/{popupId} {
+      allow read: if true; // Publicly readable
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and role information",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string", "enum": ["admin", "user"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "role"]
+    },
+    "Case": {
+      "title": "Case",
+      "description": "Successful legal cases",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string" },
+        "result": { "type": "string" },
+        "desc": { "type": "string" },
+        "docImg": { "type": "string" },
+        "order": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["type", "result", "desc", "docImg", "order"]
+    },
+    "Lawyer": {
+      "title": "Lawyer",
+      "description": "Lawyer profiles",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "img": { "type": "string" },
+        "order": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "role", "img", "order"]
+    },
+    "Certificate": {
+      "title": "Certificate",
+      "description": "Certificates and awards",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "img": { "type": "string" },
+        "order": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "img", "order"]
+    },
+    "Consultation": {
+      "title": "Consultation",
+      "description": "User consultation requests",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "type": { "type": "string" },
+        "details": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "contacted", "completed"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "phone", "type", "details", "status"]
+    },
+    "Popup": {
+      "title": "Popup",
+      "description": "Popup configuration",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "img": { "type": "string" },
+        "link": { "type": "string" },
+        "isActive": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "img", "isActive"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Stores user roles and profiles"
+    },
+    "/cases/{caseId}": {
+      "schema": { "$ref": "#/entities/Case" },
+      "description": "Stores successful legal cases"
+    },
+    "/lawyers/{lawyerId}": {
+      "schema": { "$ref": "#/entities/Lawyer" },
+      "description": "Stores lawyer profiles"
+    },
+    "/certificates/{certificateId}": {
+      "schema": { "$ref": "#/entities/Certificate" },
+      "description": "Stores certificates and awards"
+    },
+    "/consultations/{consultationId}": {
+      "schema": { "$ref": "#/entities/Consultation" },
+      "description": "Stores consultation requests from users"
+    },
+    "/popups/{popupId}": {
+      "schema": { "$ref": "#/entities/Popup" },
+      "description": "Stores popup configurations"
+    }
+  }
+}
