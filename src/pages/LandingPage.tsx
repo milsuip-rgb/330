@@ -203,14 +203,16 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative min-h-[100dvh] px-5 sm:px-6 lg:px-12 max-w-md mx-auto sm:max-w-3xl lg:max-w-7xl flex flex-col lg:flex-row justify-center items-center lg:items-center text-center lg:text-left pt-24 pb-6 lg:pb-0 gap-12 lg:gap-20 overflow-hidden">
+      <section className="relative min-h-[100dvh] px-5 sm:px-6 lg:px-12 flex flex-col justify-center items-center pt-24 pb-6 lg:pb-0 overflow-hidden">
         
         {/* Subtle 330 Watermark */}
         <div className="absolute -bottom-8 -right-8 sm:-bottom-12 sm:-right-12 text-[160px] sm:text-[280px] font-black text-[#94A3B8] opacity-[0.07] select-none pointer-events-none leading-none tracking-tighter blur-[3px] z-0">
           330
         </div>
         
-        {/* Left Content */}
+        <div className="max-w-md mx-auto sm:max-w-3xl lg:max-w-7xl w-full flex flex-col lg:flex-row justify-center items-center lg:items-center text-center lg:text-left gap-12 lg:gap-20 relative z-10">
+          
+          {/* Left Content */}
         <div className="flex-1 flex flex-col justify-center items-center lg:items-start w-full">
           
           {/* Trust Elements */}
@@ -327,6 +329,7 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
+        </div>
         </div>
 
       </section>
@@ -586,14 +589,15 @@ export default function LandingPage() {
           {/* 2. Evidence (Show, Don't Tell) */}
           <div className="w-full flex flex-col gap-20 sm:gap-24 mb-24">
             
-            {/* 1. Success Cases */}
-            <div className="w-full flex flex-col items-center">
+            <div className="w-full flex flex-col lg:flex-row gap-20 lg:gap-12 justify-center items-start max-w-7xl mx-auto">
+              {/* 1. Success Cases */}
+              <div className="w-full lg:w-1/2 flex flex-col items-center">
               <div className="flex flex-col items-center mb-8 sm:mb-10 text-center">
                 <h3 className="text-[28px] sm:text-[32px] font-bold text-white">압도적인 성공 사례</h3>
               </div>
               <div className="w-full max-w-xl relative">
                 <div 
-                  className="relative w-full h-[380px] sm:h-[420px] overflow-hidden rounded-2xl"
+                  className="relative w-full h-[380px] sm:h-[420px] lg:h-[768px] overflow-hidden rounded-2xl"
                   onTouchStart={handleCaseTouchStart}
                   onTouchEnd={handleCaseTouchEnd}
                 >
@@ -625,8 +629,8 @@ export default function LandingPage() {
                         <div className="w-full h-full bg-[#111827] border border-[#334155] rounded-2xl overflow-hidden relative flex flex-col justify-center p-8 sm:p-12 shadow-lg group">
                           {/* Background Document Image */}
                           <div className="absolute inset-0 z-0">
-                            <img src={c.docImg} alt="판결문" className="w-full h-full object-cover opacity-30 group-hover:opacity-50 transition-all duration-500 group-hover:scale-105 mix-blend-luminosity" referrerPolicy="no-referrer" />
-                            <div className="absolute inset-0 bg-gradient-to-t sm:bg-gradient-to-r from-[#111827] via-[#111827]/80 to-transparent"></div>
+                            <img src={c.docImg} alt="판결문" className="w-full h-full object-contain opacity-30 group-hover:opacity-50 transition-all duration-500 group-hover:scale-105 mix-blend-luminosity" referrerPolicy="no-referrer" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#111827] via-[#111827]/80 to-transparent"></div>
                           </div>
                           
                           <div className="relative z-10 max-w-xl">
@@ -675,14 +679,14 @@ export default function LandingPage() {
             </div>
 
             {/* 2. Lawyer Profiles */}
-            <div className="w-full flex flex-col items-center">
+            <div className="w-full lg:w-1/2 flex flex-col items-center">
               <div className="flex flex-col items-center mb-8 sm:mb-10 text-center">
                 <h3 className="text-[28px] sm:text-[32px] font-bold text-white">음주운전 전담 변호인단</h3>
               </div>
               
               {/* Lawyer Profile Slider (Stacked Cards) */}
               <div 
-                className="w-full max-w-xl relative h-[420px] sm:h-[460px] perspective-1000"
+                className="w-full max-w-xl relative h-[420px] sm:h-[460px] lg:h-[820px] perspective-1000"
                 onTouchStart={handleLawyerTouchStart}
                 onTouchEnd={handleLawyerTouchEnd}
               >
@@ -710,14 +714,14 @@ export default function LandingPage() {
                   return (
                     <div 
                       key={idx} 
-                      className="absolute top-0 left-0 right-0 h-[380px] sm:h-[420px] bg-[#111827] border border-[#334155] rounded-2xl overflow-hidden shadow-2xl transition-all duration-500 ease-in-out origin-top group hover:border-[#C5A880]/50"
+                      className="absolute top-0 left-0 right-0 h-[380px] sm:h-[420px] lg:h-[768px] bg-[#111827] border border-[#334155] rounded-2xl overflow-hidden shadow-2xl transition-all duration-500 ease-in-out origin-top group hover:border-[#C5A880]/50"
                       style={{ transform: transformStyle, zIndex, opacity }}
                     >
                       {/* Full Background Image */}
                       <img 
                         src={lawyer.img} 
                         alt={lawyer.name} 
-                        className="absolute inset-0 w-full h-full object-cover grayscale opacity-90" 
+                        className="absolute inset-0 w-full h-full object-contain object-top grayscale opacity-90" 
                         referrerPolicy="no-referrer" 
                       />
                       
@@ -737,6 +741,7 @@ export default function LandingPage() {
                   );
                 })}
               </div>
+            </div>
             </div>
 
             {/* 3. Certificates Marquee (No Box) */}
@@ -780,7 +785,7 @@ export default function LandingPage() {
             <a 
               href="#consultation-form"
               onClick={scrollToForm}
-              className="bg-gradient-to-r from-[#E2C792] to-[#C5A880] text-[#0A0F1C] font-black text-[18px] sm:text-[20px] px-12 py-5 rounded-xl mb-8 hover:from-[#D4B881] hover:to-[#B59870] transition-all shadow-lg shadow-[#C5A880]/20 active:scale-[0.98] inline-flex items-center gap-2"
+              className="lg:hidden bg-gradient-to-r from-[#E2C792] to-[#C5A880] text-[#0A0F1C] font-black text-[18px] sm:text-[20px] px-12 py-5 rounded-xl mb-8 hover:from-[#D4B881] hover:to-[#B59870] transition-all shadow-lg shadow-[#C5A880]/20 active:scale-[0.98] inline-flex items-center gap-2"
             >
               상담 신청하기
               <ArrowRight className="w-5 h-5" />
@@ -1001,6 +1006,26 @@ export default function LandingPage() {
           </div>
         </div>
       )}
+
+      {/* Fixed CTA for Desktop */}
+      <div className="hidden lg:flex fixed bottom-8 right-8 z-50 flex-col gap-3 items-end">
+        <div className="bg-[#1E293B]/90 border border-[#334155] rounded-2xl p-5 shadow-2xl backdrop-blur-md flex flex-col items-center gap-2">
+          <span className="text-[#94A3B8] text-[13px] font-bold tracking-wide">24시간 긴급 법률상담</span>
+          <a href="tel:031-214-5566" className="text-[#E2C792] text-2xl font-black tracking-wider flex items-center gap-2 hover:text-white transition-colors">
+            <Phone className="w-5 h-5" />
+            031-214-5566
+          </a>
+        </div>
+        <a 
+          href="#consultation-form"
+          onClick={scrollToForm}
+          className="bg-gradient-to-r from-[#E2C792] to-[#C5A880] text-[#0A0F1C] px-6 py-4 rounded-2xl font-black text-[16px] hover:from-[#D4B881] hover:to-[#B59870] transition-all shadow-lg shadow-[#C5A880]/20 flex items-center justify-center gap-2 w-full active:scale-95"
+        >
+          <FileText className="w-5 h-5" />
+          상담 신청하기
+        </a>
+      </div>
+
     </div>
   );
 }
