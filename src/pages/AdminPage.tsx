@@ -5,6 +5,22 @@ import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, onSnapshot, que
 import { LogOut, Plus, Trash2, Edit2, Upload, X, Check, AlertCircle, Home } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+function ConfirmModal({ isOpen, message, onConfirm, onCancel }: { isOpen: boolean, message: string, onConfirm: () => void, onCancel: () => void }) {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-5 bg-black/60 backdrop-blur-sm">
+      <div className="bg-[#1E293B] rounded-xl p-6 max-w-sm w-full border border-white/10 shadow-2xl">
+        <h3 className="text-xl font-bold text-white mb-4">확인</h3>
+        <p className="text-[#CBD5E1] mb-6">{message}</p>
+        <div className="flex justify-end gap-3">
+          <button onClick={onCancel} className="px-4 py-2 rounded-lg text-[#94A3B8] hover:bg-[#334155] transition-colors">취소</button>
+          <button onClick={onConfirm} className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors">삭제</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminPage() {
   const [user, setUser] = useState<User | null>(null);
   const [activeTab, setActiveTab] = useState('cases');
@@ -190,6 +206,7 @@ function CasesManager() {
   const [cases, setCases] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [formData, setFormData] = useState({ type: '', result: '', desc: '', docImg: '', order: 0 });
 
   useEffect(() => {
@@ -221,10 +238,11 @@ function CasesManager() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm('정말 삭제하시겠습니까?')) {
+  const handleDelete = async () => {
+    if (deleteId) {
       try {
-        await deleteDoc(doc(db, 'cases', id));
+        await deleteDoc(doc(db, 'cases', deleteId));
+        setDeleteId(null);
       } catch (error) {
         console.error("Error deleting case", error);
       }
@@ -233,6 +251,12 @@ function CasesManager() {
 
   return (
     <div>
+      <ConfirmModal 
+        isOpen={!!deleteId} 
+        message="정말 삭제하시겠습니까?" 
+        onConfirm={handleDelete} 
+        onCancel={() => setDeleteId(null)} 
+      />
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-2xl font-bold">성공사례 관리</h3>
         <button 
@@ -290,7 +314,7 @@ function CasesManager() {
             </div>
             <div className="flex gap-2">
               <button onClick={() => { setFormData(c); setEditId(c.id); setIsEditing(true); }} className="p-2 text-[#94A3B8] hover:text-white bg-[#0A0F1C] rounded-lg"><Edit2 className="w-4 h-4" /></button>
-              <button onClick={() => handleDelete(c.id)} className="p-2 text-red-400 hover:text-red-300 bg-[#0A0F1C] rounded-lg"><Trash2 className="w-4 h-4" /></button>
+              <button onClick={() => setDeleteId(c.id)} className="p-2 text-red-400 hover:text-red-300 bg-[#0A0F1C] rounded-lg"><Trash2 className="w-4 h-4" /></button>
             </div>
           </div>
         ))}
@@ -304,6 +328,7 @@ function LawyersManager() {
   const [lawyers, setLawyers] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [formData, setFormData] = useState({ name: '', role: '', img: '', order: 0 });
 
   useEffect(() => {
@@ -335,10 +360,11 @@ function LawyersManager() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm('정말 삭제하시겠습니까?')) {
+  const handleDelete = async () => {
+    if (deleteId) {
       try {
-        await deleteDoc(doc(db, 'lawyers', id));
+        await deleteDoc(doc(db, 'lawyers', deleteId));
+        setDeleteId(null);
       } catch (error) {
         console.error("Error deleting lawyer", error);
       }
@@ -347,6 +373,12 @@ function LawyersManager() {
 
   return (
     <div>
+      <ConfirmModal 
+        isOpen={!!deleteId} 
+        message="정말 삭제하시겠습니까?" 
+        onConfirm={handleDelete} 
+        onCancel={() => setDeleteId(null)} 
+      />
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-2xl font-bold">변호사 관리</h3>
         <button 
@@ -399,7 +431,7 @@ function LawyersManager() {
             </div>
             <div className="flex gap-2">
               <button onClick={() => { setFormData(l); setEditId(l.id); setIsEditing(true); }} className="p-2 text-[#94A3B8] hover:text-white bg-[#0A0F1C] rounded-lg"><Edit2 className="w-4 h-4" /></button>
-              <button onClick={() => handleDelete(l.id)} className="p-2 text-red-400 hover:text-red-300 bg-[#0A0F1C] rounded-lg"><Trash2 className="w-4 h-4" /></button>
+              <button onClick={() => setDeleteId(l.id)} className="p-2 text-red-400 hover:text-red-300 bg-[#0A0F1C] rounded-lg"><Trash2 className="w-4 h-4" /></button>
             </div>
           </div>
         ))}
@@ -413,6 +445,7 @@ function CertificatesManager() {
   const [certificates, setCertificates] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [formData, setFormData] = useState({ title: '', img: '', order: 0 });
 
   useEffect(() => {
@@ -444,10 +477,11 @@ function CertificatesManager() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm('정말 삭제하시겠습니까?')) {
+  const handleDelete = async () => {
+    if (deleteId) {
       try {
-        await deleteDoc(doc(db, 'certificates', id));
+        await deleteDoc(doc(db, 'certificates', deleteId));
+        setDeleteId(null);
       } catch (error) {
         console.error("Error deleting certificate", error);
       }
@@ -456,6 +490,12 @@ function CertificatesManager() {
 
   return (
     <div>
+      <ConfirmModal 
+        isOpen={!!deleteId} 
+        message="정말 삭제하시겠습니까?" 
+        onConfirm={handleDelete} 
+        onCancel={() => setDeleteId(null)} 
+      />
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-2xl font-bold">위촉장 관리</h3>
         <button 
@@ -503,7 +543,7 @@ function CertificatesManager() {
             </div>
             <div className="flex gap-2">
               <button onClick={() => { setFormData(c); setEditId(c.id); setIsEditing(true); }} className="p-2 text-[#94A3B8] hover:text-white bg-[#0A0F1C] rounded-lg"><Edit2 className="w-4 h-4" /></button>
-              <button onClick={() => handleDelete(c.id)} className="p-2 text-red-400 hover:text-red-300 bg-[#0A0F1C] rounded-lg"><Trash2 className="w-4 h-4" /></button>
+              <button onClick={() => setDeleteId(c.id)} className="p-2 text-red-400 hover:text-red-300 bg-[#0A0F1C] rounded-lg"><Trash2 className="w-4 h-4" /></button>
             </div>
           </div>
         ))}
@@ -515,6 +555,7 @@ function CertificatesManager() {
 
 function ConsultationsManager() {
   const [consultations, setConsultations] = useState<any[]>([]);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     const q = query(collection(db, 'consultations'), orderBy('createdAt', 'desc'));
@@ -533,10 +574,11 @@ function ConsultationsManager() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm('정말 삭제하시겠습니까?')) {
+  const handleDelete = async () => {
+    if (deleteId) {
       try {
-        await deleteDoc(doc(db, 'consultations', id));
+        await deleteDoc(doc(db, 'consultations', deleteId));
+        setDeleteId(null);
       } catch (error) {
         console.error("Error deleting consultation", error);
       }
@@ -545,6 +587,12 @@ function ConsultationsManager() {
 
   return (
     <div>
+      <ConfirmModal 
+        isOpen={!!deleteId} 
+        message="정말 삭제하시겠습니까?" 
+        onConfirm={handleDelete} 
+        onCancel={() => setDeleteId(null)} 
+      />
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-2xl font-bold">상담 신청 내역</h3>
       </div>
@@ -578,7 +626,7 @@ function ConsultationsManager() {
                   <option value="contacted">연락완료</option>
                   <option value="completed">상담완료</option>
                 </select>
-                <button onClick={() => handleDelete(c.id)} className="p-2 text-red-400 hover:text-red-300 bg-[#0A0F1C] rounded-lg">
+                <button onClick={() => setDeleteId(c.id)} className="p-2 text-red-400 hover:text-red-300 bg-[#0A0F1C] rounded-lg">
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
@@ -598,6 +646,7 @@ function PopupsManager() {
   const [popups, setPopups] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [formData, setFormData] = useState({ title: '', img: '', link: '', isActive: true });
 
   useEffect(() => {
@@ -633,10 +682,11 @@ function PopupsManager() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm('정말 삭제하시겠습니까?')) {
+  const handleDelete = async () => {
+    if (deleteId) {
       try {
-        await deleteDoc(doc(db, 'popups', id));
+        await deleteDoc(doc(db, 'popups', deleteId));
+        setDeleteId(null);
       } catch (error) {
         console.error("Error deleting popup", error);
       }
@@ -653,6 +703,12 @@ function PopupsManager() {
 
   return (
     <div>
+      <ConfirmModal 
+        isOpen={!!deleteId} 
+        message="정말 삭제하시겠습니까?" 
+        onConfirm={handleDelete} 
+        onCancel={() => setDeleteId(null)} 
+      />
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-2xl font-bold">팝업 관리</h3>
         <button 
@@ -723,7 +779,7 @@ function PopupsManager() {
                 {p.isActive ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
               </button>
               <button onClick={() => { setFormData(p); setEditId(p.id); setIsEditing(true); }} className="p-2 text-[#94A3B8] hover:text-white bg-[#0A0F1C] rounded-lg"><Edit2 className="w-4 h-4" /></button>
-              <button onClick={() => handleDelete(p.id)} className="p-2 text-red-400 hover:text-red-300 bg-[#0A0F1C] rounded-lg"><Trash2 className="w-4 h-4" /></button>
+              <button onClick={() => setDeleteId(p.id)} className="p-2 text-red-400 hover:text-red-300 bg-[#0A0F1C] rounded-lg"><Trash2 className="w-4 h-4" /></button>
             </div>
           </div>
         ))}

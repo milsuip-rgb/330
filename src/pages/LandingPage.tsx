@@ -106,8 +106,8 @@ export default function LandingPage() {
 
   const handleConsultationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.phone || !formData.details) {
-      alert('모든 항목을 입력해주세요.');
+    if (!formData.name || !formData.phone) {
+      alert('이름과 연락처를 입력해주세요.');
       return;
     }
     setIsSubmitting(true);
@@ -117,6 +117,30 @@ export default function LandingPage() {
         status: 'pending',
         createdAt: new Date().toISOString()
       });
+
+      // Send Telegram Notification
+      const botToken = import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
+      const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID;
+      
+      if (botToken && chatId) {
+        const message = `🚨 새로운 상담 신청이 접수되었습니다!\n\n👤 이름: ${formData.name}\n📞 연락처: ${formData.phone}\n🍷 알코올 농도: ${formData.alcoholLevel}\n🚔 음주운전 전력: ${formData.duiHistory}\n📝 내용: ${formData.details}`;
+        
+        try {
+          await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              chat_id: chatId,
+              text: message,
+            }),
+          });
+        } catch (telegramError) {
+          console.error("Telegram notification failed", telegramError);
+        }
+      }
+
       setShowSuccessMessage(true);
       setTimeout(() => setShowSuccessMessage(false), 3000);
       setFormData({ name: '', phone: '', alcoholLevel: '0.03~0.08%', duiHistory: '0회', details: '' });
@@ -143,6 +167,11 @@ export default function LandingPage() {
       clearInterval(caseTimer);
     };
   }, [lawyers.length, cases.length]);
+
+  const scrollToForm = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    document.getElementById('consultation-form')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <div className="min-h-screen bg-[#0A0F1C] font-sans text-white selection:bg-[#C5A880]/30 pb-20 lg:pb-0">
@@ -242,10 +271,14 @@ export default function LandingPage() {
               <Phone className="w-5 h-5 text-[#94A3B8]" />
               전화 상담
             </a>
-            <button className="flex items-center justify-center gap-2 bg-gradient-to-r from-[#E2C792] to-[#C5A880] text-[#0A0F1C] px-8 py-4 rounded-xl font-bold text-[17px] hover:from-[#D4B881] hover:to-[#B59870] transition-colors shadow-lg shadow-[#C5A880]/20 active:scale-[0.98]">
+            <a 
+              href="#consultation-form"
+              onClick={scrollToForm}
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-[#E2C792] to-[#C5A880] text-[#0A0F1C] px-8 py-4 rounded-xl font-bold text-[17px] hover:from-[#D4B881] hover:to-[#B59870] transition-colors shadow-lg shadow-[#C5A880]/20 active:scale-[0.98]"
+            >
               <FileText className="w-5 h-5" />
               상담 신청하기
-            </button>
+            </a>
           </div>
 
         </div>
@@ -741,9 +774,17 @@ export default function LandingPage() {
 
           {/* 4. Transition to CTA */}
           <div className="text-center flex flex-col items-center">
-            <h4 className="text-[20px] sm:text-[24px] text-[#94A3B8] font-bold mb-6 tracking-wide">
+            <h4 className="text-[20px] sm:text-[24px] text-[#94A3B8] font-bold mb-8 tracking-wide">
               이제, 선택만 남았습니다.
             </h4>
+            <a 
+              href="#consultation-form"
+              onClick={scrollToForm}
+              className="bg-gradient-to-r from-[#E2C792] to-[#C5A880] text-[#0A0F1C] font-black text-[18px] sm:text-[20px] px-12 py-5 rounded-xl mb-8 hover:from-[#D4B881] hover:to-[#B59870] transition-all shadow-lg shadow-[#C5A880]/20 active:scale-[0.98] inline-flex items-center gap-2"
+            >
+              상담 신청하기
+              <ArrowRight className="w-5 h-5" />
+            </a>
             <ArrowDown className="w-8 h-8 text-[#CBD5E1] animate-bounce" />
           </div>
 
@@ -751,7 +792,7 @@ export default function LandingPage() {
       </section>
 
       {/* Section 5: CTA / Contact Form (Action) */}
-      <section className="relative py-24 lg:py-32 bg-[#0A0F1C] px-5 sm:px-6 lg:px-12 overflow-hidden">
+      <section id="consultation-form" className="relative py-24 lg:py-32 bg-[#0A0F1C] px-5 sm:px-6 lg:px-12 overflow-hidden">
         {/* Subtle 330 Watermark */}
         <div className="absolute -bottom-8 -right-8 sm:-bottom-12 sm:-right-12 text-[160px] sm:text-[280px] font-black text-[#94A3B8] opacity-[0.07] select-none pointer-events-none leading-none tracking-tighter blur-[3px] z-0">
           330
@@ -796,7 +837,7 @@ export default function LandingPage() {
               
               {/* Name */}
               <div className="flex flex-col gap-2">
-                <label className="text-white font-bold text-[15px] sm:text-[16px] ml-1">이름</label>
+                <label className="text-white font-bold text-[15px] sm:text-[16px] ml-1">이름 <span className="text-red-400 text-[13px] font-normal ml-1">(필수)</span></label>
                 <input 
                   type="text" 
                   placeholder="이름을 입력해주세요" 
@@ -808,7 +849,7 @@ export default function LandingPage() {
 
               {/* Contact */}
               <div className="flex flex-col gap-2">
-                <label className="text-white font-bold text-[15px] sm:text-[16px] ml-1">연락처</label>
+                <label className="text-white font-bold text-[15px] sm:text-[16px] ml-1">연락처 <span className="text-red-400 text-[13px] font-normal ml-1">(필수)</span></label>
                 <input 
                   type="tel" 
                   placeholder="연락 가능한 번호" 
@@ -820,7 +861,7 @@ export default function LandingPage() {
 
               {/* Alcohol Level */}
               <div className="flex flex-col gap-2">
-                <label className="text-white font-bold text-[15px] sm:text-[16px] ml-1">알코올 농도</label>
+                <label className="text-white font-bold text-[15px] sm:text-[16px] ml-1">알코올 농도 <span className="text-[#64748B] text-[13px] font-normal ml-1">(선택)</span></label>
                 <select 
                   value={formData.alcoholLevel}
                   onChange={(e) => setFormData({...formData, alcoholLevel: e.target.value})}
@@ -836,7 +877,7 @@ export default function LandingPage() {
 
               {/* DUI History */}
               <div className="flex flex-col gap-2">
-                <label className="text-white font-bold text-[15px] sm:text-[16px] ml-1">음주운전 전력</label>
+                <label className="text-white font-bold text-[15px] sm:text-[16px] ml-1">음주운전 전력 <span className="text-[#64748B] text-[13px] font-normal ml-1">(선택)</span></label>
                 <select 
                   value={formData.duiHistory}
                   onChange={(e) => setFormData({...formData, duiHistory: e.target.value})}
@@ -853,7 +894,7 @@ export default function LandingPage() {
 
               {/* Incident Details */}
               <div className="flex flex-col gap-2">
-                <label className="text-white font-bold text-[15px] sm:text-[16px] ml-1">사건 경위</label>
+                <label className="text-white font-bold text-[15px] sm:text-[16px] ml-1">사건 경위 <span className="text-[#64748B] text-[13px] font-normal ml-1">(선택)</span></label>
                 <textarea 
                   placeholder="간단히 상황을 적어주세요&#13;&#10;(예: 단속 경위, 사고 여부 등)" 
                   rows={4}
@@ -869,7 +910,7 @@ export default function LandingPage() {
                 disabled={isSubmitting}
                 className="w-full bg-gradient-to-r from-[#E2C792] to-[#C5A880] text-[#0A0F1C] font-black text-[18px] sm:text-[20px] py-5 rounded-xl mt-4 hover:from-[#D4B881] hover:to-[#B59870] transition-all shadow-lg shadow-[#C5A880]/20 active:scale-[0.98] disabled:opacity-50"
               >
-                {isSubmitting ? '신청 중...' : '상담 신청 하기'}
+                {isSubmitting ? '신청 중...' : '상담 신청하기'}
               </button>
 
               {/* 5. Bottom Triggers */}
@@ -909,10 +950,14 @@ export default function LandingPage() {
             <Phone className="w-5 h-5 text-[#94A3B8]" />
             전화 상담
           </a>
-          <button className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-[#E2C792] to-[#C5A880] text-[#0A0F1C] py-3.5 rounded-xl font-bold text-[16px] hover:from-[#D4B881] hover:to-[#B59870] transition-colors shadow-lg shadow-[#C5A880]/20 active:scale-[0.98]">
+          <a 
+            href="#consultation-form"
+            onClick={scrollToForm}
+            className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-[#E2C792] to-[#C5A880] text-[#0A0F1C] py-3.5 rounded-xl font-bold text-[16px] hover:from-[#D4B881] hover:to-[#B59870] transition-colors shadow-lg shadow-[#C5A880]/20 active:scale-[0.98]"
+          >
             <FileText className="w-5 h-5" />
             상담 신청하기
-          </button>
+          </a>
         </div>
       </div>
 
