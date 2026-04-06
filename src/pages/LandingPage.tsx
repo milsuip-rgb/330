@@ -937,14 +937,30 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#0A0F1C] border-t border-[#334155] py-10 px-5 sm:px-6 lg:px-12 text-center lg:text-left">
-        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-center lg:items-start gap-6">
-          <div className="flex flex-col gap-2 text-[#64748B] text-[13px] sm:text-[14px]">
-            <p className="font-bold text-[#94A3B8] text-[15px] mb-1">법률사무소 법진 형사센터</p>
-            <p>대표변호사 : 정해원, 윤선영</p>
-            <p>주소 : 경기도 수원시 영통구 광교중앙로 248번길 7-3 5층 503호, 504호</p>
-            <p>전화 : 031-214-5566 | 팩스 : 031-213-6655 | 이메일 : lawofficebj@naver.com</p>
-            <p className="mt-2">Copyright © 법률사무소 법진. All rights reserved.</p>
+      <footer className="bg-[#0A0F1C] border-t border-[#334155] py-12 px-5 sm:px-6 lg:px-12 text-center">
+        <div className="max-w-7xl mx-auto flex flex-col items-center gap-6">
+          <img src="https://beobjin-criminal.com/images/common/logo.png" alt="법률사무소 법진" className="h-8 object-contain opacity-50 mb-2" />
+          
+          <div className="flex flex-col gap-2 text-[#64748B] text-[13px] sm:text-[14px] items-center">
+            <div className="flex flex-col md:flex-row items-center gap-1 md:gap-0">
+              <span>법률사무소 법진</span>
+              <span className="hidden md:inline mx-3 text-[#334155]">|</span>
+              <span>대표변호사. 정해원, 윤선영, 곽은정</span>
+              <span className="hidden md:inline mx-3 text-[#334155]">|</span>
+              <span>사업자등록번호: 587-12-02153</span>
+            </div>
+            
+            <div className="flex flex-col md:flex-row items-center gap-1 md:gap-0 mt-1">
+              <span>주소 : 경기도 수원시 영통구 광교중앙로 248번길 7-3, 503호(하동, 우연법전프라자)</span>
+              <span className="hidden md:inline mx-3 text-[#334155]">|</span>
+              <span>TEL: 031-214-5566</span>
+              <span className="hidden md:inline mx-3 text-[#334155]">|</span>
+              <span>FAX : 031-213-6655</span>
+              <span className="hidden md:inline mx-3 text-[#334155]">|</span>
+              <span>E-mail : lawofficebj@naver.com</span>
+            </div>
+
+            <p className="mt-6">Copyright © 법률사무소 법진. All rights reserved.</p>
             <Link to="/admin" className="text-[#334155] hover:text-[#64748B] text-xs mt-2 transition-colors inline-block">
               관리자 페이지
             </Link>
