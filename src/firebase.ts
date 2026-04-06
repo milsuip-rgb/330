@@ -15,8 +15,9 @@ export const loginWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
     return result.user;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error signing in with Google", error);
+    alert(`로그인 중 오류가 발생했습니다: ${error.message || error.code || error}`);
     throw error;
   }
 };

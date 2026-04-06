@@ -39,11 +39,24 @@ export default function AdminPage() {
   }
 
   if (!user) {
+    const handleLogin = async () => {
+      try {
+        await loginWithGoogle();
+      } catch (error: any) {
+        console.error(error);
+        if (error.code === 'auth/unauthorized-domain') {
+          alert('승인되지 않은 도메인입니다. Firebase 콘솔의 Authentication > Settings > Authorized domains에 현재 도메인(drunkdriving330.com)을 추가해주세요.');
+        } else {
+          alert(`로그인 실패: ${error.message}`);
+        }
+      }
+    };
+
     return (
       <div className="min-h-screen bg-[#0A0F1C] text-white flex flex-col items-center justify-center">
         <h1 className="text-3xl font-bold mb-8 text-[#E2C792]">관리자 로그인</h1>
         <button 
-          onClick={loginWithGoogle}
+          onClick={handleLogin}
           className="bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition-colors"
         >
           Google 계정으로 로그인
@@ -213,6 +226,11 @@ function CasesManager() {
     const q = query(collection(db, 'cases'), orderBy('order', 'asc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setCases(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (error) => {
+      console.error("Cases fetch error:", error);
+      if (error.message.includes('permission')) {
+        alert("권한이 없습니다. 관리자 계정으로 로그인해주세요.");
+      }
     });
     return () => unsubscribe();
   }, []);
@@ -335,6 +353,8 @@ function LawyersManager() {
     const q = query(collection(db, 'lawyers'), orderBy('order', 'asc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setLawyers(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (error) => {
+      console.error("Lawyers fetch error:", error);
     });
     return () => unsubscribe();
   }, []);
@@ -452,6 +472,8 @@ function CertificatesManager() {
     const q = query(collection(db, 'certificates'), orderBy('order', 'asc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setCertificates(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (error) => {
+      console.error("Certificates fetch error:", error);
     });
     return () => unsubscribe();
   }, []);
@@ -561,6 +583,11 @@ function ConsultationsManager() {
     const q = query(collection(db, 'consultations'), orderBy('createdAt', 'desc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setConsultations(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (error) => {
+      console.error("Consultations fetch error:", error);
+      if (error.message.includes('permission')) {
+        alert("상담 내역을 볼 권한이 없습니다. 관리자 계정인지 확인해주세요.");
+      }
     });
     return () => unsubscribe();
   }, []);
@@ -653,6 +680,8 @@ function PopupsManager() {
     const q = query(collection(db, 'popups'), orderBy('createdAt', 'desc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setPopups(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (error) => {
+      console.error("Popups fetch error:", error);
     });
     return () => unsubscribe();
   }, []);
