@@ -45,7 +45,7 @@ export default function AdminPage() {
       } catch (error: any) {
         console.error(error);
         if (error.code === 'auth/unauthorized-domain') {
-          alert('승인되지 않은 도메인입니다. Firebase 콘솔의 Authentication > Settings > Authorized domains에 현재 도메인(drunkdriving330.com)을 추가해주세요.');
+          alert(`승인되지 않은 도메인입니다. Firebase 콘솔의 Authentication > Settings > Authorized domains에 현재 접속하신 도메인(${window.location.hostname})을 정확히 추가해주세요. (www 포함 여부 확인)`);
         } else {
           alert(`로그인 실패: ${error.message}`);
         }
