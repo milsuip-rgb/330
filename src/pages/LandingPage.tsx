@@ -782,14 +782,6 @@ export default function LandingPage() {
             <h4 className="text-[20px] sm:text-[24px] text-[#94A3B8] font-bold mb-8 tracking-wide">
               이제, 선택만 남았습니다.
             </h4>
-            <a 
-              href="#consultation-form"
-              onClick={scrollToForm}
-              className="lg:hidden bg-gradient-to-r from-[#E2C792] to-[#C5A880] text-[#0A0F1C] font-black text-[18px] sm:text-[20px] px-12 py-5 rounded-xl mb-8 hover:from-[#D4B881] hover:to-[#B59870] transition-all shadow-lg shadow-[#C5A880]/20 active:scale-[0.98] inline-flex items-center gap-2"
-            >
-              상담 신청하기
-              <ArrowRight className="w-5 h-5" />
-            </a>
             <ArrowDown className="w-8 h-8 text-[#CBD5E1] animate-bounce" />
           </div>
 
