@@ -77,7 +77,8 @@ export default function AdminPage() {
             { id: 'lawyers', label: '변호사 관리' },
             { id: 'certificates', label: '위촉장 관리' },
             { id: 'consultations', label: '상담 신청 내역' },
-            { id: 'popups', label: '팝업 관리' }
+            { id: 'popups', label: '팝업 관리' },
+            { id: 'settings', label: '설정 관리' }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -119,6 +120,7 @@ export default function AdminPage() {
         {activeTab === 'certificates' && <CertificatesManager />}
         {activeTab === 'consultations' && <ConsultationsManager />}
         {activeTab === 'popups' && <PopupsManager />}
+        {activeTab === 'settings' && <SettingsManager />}
       </div>
     </div>
   );
@@ -813,6 +815,84 @@ function PopupsManager() {
           </div>
         ))}
         {popups.length === 0 && <div className="text-center text-[#94A3B8] py-8">등록된 팝업이 없습니다.</div>}
+      </div>
+    </div>
+  );
+}
+
+function SettingsManager() {
+  const [settings, setSettings] = useState({ botToken: '', chatId: '' });
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(doc(db, 'settings', 'telegram'), (docSnap) => {
+      if (docSnap.exists()) {
+        setSettings(docSnap.data() as any);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      // Use setDoc to create or overwrite the document
+      const { setDoc } = await import('firebase/firestore');
+      await setDoc(doc(db, 'settings', 'telegram'), settings);
+      alert('설정이 저장되었습니다.');
+    } catch (error) {
+      console.error("Error saving settings", error);
+      alert('설정 저장 중 오류가 발생했습니다.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="text-2xl font-bold">설정 관리</h3>
+      </div>
+
+      <div className="bg-[#1E293B] p-6 rounded-xl border border-[#334155] max-w-2xl">
+        <h4 className="text-lg font-bold text-white mb-4">텔레그램 알림 설정</h4>
+        <p className="text-[#94A3B8] text-sm mb-6">
+          웹페이지에서 상담 신청이 들어왔을 때 텔레그램으로 알림을 받기 위한 설정입니다.
+          이곳에 봇 토큰과 챗 ID를 입력하시면, 기존 환경 변수 대신 이 설정값이 우선적으로 사용됩니다.
+        </p>
+
+        <form onSubmit={handleSave} className="flex flex-col gap-4">
+          <div>
+            <label className="block text-sm text-[#94A3B8] mb-1">Bot Token (봇 토큰)</label>
+            <input 
+              type="text" 
+              value={settings.botToken || ''} 
+              onChange={e => setSettings({...settings, botToken: e.target.value})} 
+              className="w-full bg-[#0A0F1C] border border-[#334155] rounded-lg px-4 py-2 text-white" 
+              placeholder="예: 123456789:ABCdefGHIjklMNOpqrsTUVwxyz" 
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-[#94A3B8] mb-1">Chat ID (챗 ID)</label>
+            <input 
+              type="text" 
+              value={settings.chatId || ''} 
+              onChange={e => setSettings({...settings, chatId: e.target.value})} 
+              className="w-full bg-[#0A0F1C] border border-[#334155] rounded-lg px-4 py-2 text-white" 
+              placeholder="예: 123456789" 
+            />
+          </div>
+          <div className="flex justify-end mt-4">
+            <button 
+              type="submit" 
+              disabled={isSaving}
+              className="bg-emerald-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-emerald-600 disabled:opacity-50"
+            >
+              {isSaving ? '저장 중...' : '저장하기'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

@@ -119,8 +119,20 @@ export default function LandingPage() {
       });
 
       // Send Telegram Notification
-      const botToken = import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
-      const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID;
+      let botToken = import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
+      let chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID;
+
+      try {
+        const { getDoc, doc } = await import('firebase/firestore');
+        const settingsDoc = await getDoc(doc(db, 'settings', 'telegram'));
+        if (settingsDoc.exists()) {
+          const data = settingsDoc.data();
+          if (data.botToken) botToken = data.botToken;
+          if (data.chatId) chatId = data.chatId;
+        }
+      } catch (e) {
+        console.error("Failed to fetch telegram settings from Firestore", e);
+      }
       
       if (botToken && chatId) {
         const message = `🚨 새로운 상담 신청이 접수되었습니다!\n\n👤 이름: ${formData.name}\n📞 연락처: ${formData.phone}\n🍷 알코올 농도: ${formData.alcoholLevel}\n🚔 음주운전 전력: ${formData.duiHistory}\n📝 내용: ${formData.details}`;

@@ -172,5 +172,12 @@ service cloud.firestore {
       allow update: if isAdmin();
       allow delete: if isAdmin();
     }
+
+    match /settings/{settingId} {
+      allow read: if true; // Publicly readable for frontend to fetch bot token
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
   }
 }
