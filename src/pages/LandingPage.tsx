@@ -84,11 +84,13 @@ export default function LandingPage() {
 
   // Case Slider State & Handlers
   const [caseIndex, setCaseIndex] = useState(0);
+  const [isCasePaused, setIsCasePaused] = useState(false);
   const caseTouchStartX = useRef(0);
   const caseTouchEndX = useRef(0);
 
   const handleCaseTouchStart = (e: React.TouchEvent) => {
     caseTouchStartX.current = e.changedTouches[0].screenX;
+    setIsCasePaused(true);
   };
   const handleCaseTouchEnd = (e: React.TouchEvent) => {
     caseTouchEndX.current = e.changedTouches[0].screenX;
@@ -98,6 +100,7 @@ export default function LandingPage() {
     if (caseTouchEndX.current - caseTouchStartX.current > 50) {
       setCaseIndex((prev) => (prev - 1 + cases.length) % cases.length);
     }
+    setIsCasePaused(false);
   };
 
   const [formData, setFormData] = useState({ name: '', phone: '', alcoholLevel: '0.03~0.08%', duiHistory: '0회', details: '' });
@@ -171,14 +174,19 @@ export default function LandingPage() {
     const lawyerTimer = setInterval(() => {
       setLawyerIndex((prev) => (prev + 1) % lawyers.length);
     }, 3000);
-    const caseTimer = setInterval(() => {
-      setCaseIndex((prev) => (prev + 1) % cases.length);
-    }, 4000);
+    
+    let caseTimer: NodeJS.Timeout;
+    if (!isCasePaused) {
+      caseTimer = setInterval(() => {
+        setCaseIndex((prev) => (prev + 1) % cases.length);
+      }, 4000);
+    }
+    
     return () => {
       clearInterval(lawyerTimer);
-      clearInterval(caseTimer);
+      if (caseTimer) clearInterval(caseTimer);
     };
-  }, [lawyers.length, cases.length]);
+  }, [lawyers.length, cases.length, isCasePaused]);
 
   const scrollToForm = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -612,6 +620,8 @@ export default function LandingPage() {
                   className="relative w-full h-[380px] sm:h-[420px] lg:h-[768px] overflow-hidden rounded-2xl"
                   onTouchStart={handleCaseTouchStart}
                   onTouchEnd={handleCaseTouchEnd}
+                  onMouseEnter={() => setIsCasePaused(true)}
+                  onMouseLeave={() => setIsCasePaused(false)}
                 >
                   {cases.map((c, idx) => {
                     const isActive = idx === caseIndex;
@@ -646,9 +656,9 @@ export default function LandingPage() {
                           </div>
                           
                           <div className="relative z-10 max-w-xl">
-                            <div className="inline-flex items-center gap-2 bg-[#1E293B] border border-[#475569] px-3 py-1.5 rounded-full mb-6 shadow-md">
-                              <Gavel className="w-4 h-4 text-[#94A3B8]" />
-                              <span className="text-[14px] sm:text-[16px] text-[#CBD5E1] font-bold">{c.type}</span>
+                            <div className="inline-flex items-center gap-2 bg-red-600 border border-red-500 px-3 py-1.5 rounded-full mb-6 shadow-lg shadow-red-900/50">
+                              <Gavel className="w-4 h-4 text-white" />
+                              <span className="text-[14px] sm:text-[16px] text-white font-bold">{c.type}</span>
                             </div>
                             <h3 className="text-[36px] sm:text-[48px] lg:text-[56px] font-black text-emerald-400 tracking-tight mb-4 drop-shadow-xl leading-none">
                               {c.result}
